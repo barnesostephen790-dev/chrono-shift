@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>8 HTML5 Canvas Graphical Arts (200x200)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f4f6f9;
+      color: #1f2937;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    p.subtitle {
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      width: 200px;
+      height: 200px;
+      border-radius: 8px;
+      background-color: #ffffff;
+      display: block;
+    }
+    .label {
+      margin-top: 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+  <h1>8 HTML5 Canvas Graphical Arts</h1>
+  <p class="subtitle">Each canvas is strictly 200&times;200 pixels using 2D drawing primitives.</p>
+
+  <div class="gallery">
+    <div class="card">
+      <canvas id="art1" width="200" height="200"></canvas>
+      <span class="label">1. Rocket Ship</span>
+    </div>
+    <div class="card">
+      <canvas id="art2" width="200" height="200"></canvas>
+      <span class="label">2. Ringed Planet</span>
+    </div>
+    <div class="card">
+      <canvas id="art3" width="200" height="200"></canvas>
+      <span class="label">3. Night Crescent</span>
+    </div>
+    <div class="card">
+      <canvas id="art4" width="200" height="200"></canvas>
+      <span class="label">4. Mountain Sunrise</span>
+    </div>
+    <div class="card">
+      <canvas id="art5" width="200" height="200"></canvas>
+      <span class="label">5. Pine Tree</span>
+    </div>
+    <div class="card">
+      <canvas id="art6" width="200" height="200"></canvas>
+      <span class="label">6. Campfire</span>
+    </div>
+    <div class="card">
+      <canvas id="art7" width="200" height="200"></canvas>
+      <span class="label">7. Lighthouse</span>
+    </div>
+    <div class="card">
+      <canvas id="art8" width="200" height="200"></canvas>
+      <span class="label">8. Hot Air Balloon</span>
+    </div>
+  </div>
+
+  <script>
+    // 1. Rocket Ship
+    (function drawRocket() {
+      const ctx = document.getElementById("art1").getContext("2d");
+
+      // Flame
+      ctx.beginPath();
+      ctx.moveTo(85, 145);
+      ctx.quadraticCurveTo(100, 190, 115, 145);
+      ctx.fillStyle = "#f97316";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(92, 145);
+      ctx.quadraticCurveTo(100, 172, 108, 145);
+      ctx.fillStyle = "#facc15";
+      ctx.fill();
+
+      // Left & Right Fins
+      ctx.beginPath();
+      ctx.moveTo(76, 115);
+      ctx.lineTo(54, 148);
+      ctx.lineTo(78, 142);
+      ctx.closePath();
+      ctx.fillStyle = "#ef4444";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(124, 115);
+      ctx.lineTo(146, 148);
+      ctx.lineTo(122, 142);
+      ctx.closePath();
+      ctx.fillStyle = "#ef4444";
+      ctx.fill();
+
+      // Body
+      ctx.beginPath();
+      ctx.moveTo(100, 26);
+      ctx.quadraticCurveTo(128, 65, 122, 144);
+      ctx.lineTo(78, 144);
+      ctx.quadraticCurveTo(72, 65, 100, 26);
+      ctx.closePath();
+      ctx.fillStyle = "#e5e7eb";
+      ctx.fill();
+
+      // Nose Cone Accent
+      ctx.beginPath();
+      ctx.moveTo(100, 26);
+      ctx.quadraticCurveTo(114, 45, 117, 62);
+      ctx.lineTo(83, 62);
+      ctx.quadraticCurveTo(86, 45, 100, 26);
+      ctx.closePath();
+      ctx.fillStyle = "#ef4444";
+      ctx.fill();
+
+      // Porthole Window
+      ctx.beginPath();
+      ctx.arc(100, 92, 15, 0, Math.PI * 2);
+      ctx.fillStyle = "#38bdf8";
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "#4b5563";
+      ctx.stroke();
+    })();
+
+    // 2. Ringed Planet
+    (function drawPlanet() {
+      const ctx = document.getElementById("art2").getContext("2d");
+
+      // Back half of ring
+      ctx.save();
+      ctx.translate(100, 100);
+      ctx.rotate(-0.35);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 74, 20, 0, Math.PI, Math.PI * 2);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "#fbbf24";
+      ctx.stroke();
+      ctx.restore();
+
+      // Planet Sphere
+      ctx.beginPath();
+      ctx.arc(100, 100, 44, 0, Math.PI * 2);
+      ctx.fillStyle = "#6366f1";
+      ctx.fill();
+
+      // Planet Stripe
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(100, 100, 44, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.fillStyle = "#818cf8";
+      ctx.fillRect(50, 88, 100, 14);
+      ctx.restore();
+
+      // Front half of ring
+      ctx.save();
+      ctx.translate(100, 100);
+      ctx.rotate(-0.35);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 74, 20, 0, 0, Math.PI);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "#f59e0b";
+      ctx.stroke();
+      ctx.restore();
+    })();
+
+    // 3. Night Crescent & Stars
+    (function drawCrescent() {
+      const ctx = document.getElementById("art3").getContext("2d");
+
+      // Sky background circle
+      ctx.beginPath();
+      ctx.arc(100, 100, 76, 0, Math.PI * 2);
+      ctx.fillStyle = "#1e1b4b";
+      ctx.fill();
+
+      // Crescent Moon (using even-odd fill with two overlapping circles)
+      ctx.beginPath();
+      ctx.arc(95, 102, 42, 0, Math.PI * 2);
+      ctx.arc(114, 90, 36, 0, Math.PI * 2);
+      ctx.fillStyle = "#fde047";
+      ctx.fill("evenodd");
+
+      // Small stars
+      const stars = [
+        [62, 62, 3],
+        [142, 68, 2.5],
+        [136, 134, 3],
+        [66, 142, 2]
+      ];
+      ctx.fillStyle = "#fef9c3";
+      stars.forEach(([x, y, r]) => {
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    })();
+
+    // 4. Mountain Sunrise
+    (function drawMountain() {
+      const ctx = document.getElementById("art4").getContext("2d");
+
+      // Sun
+      ctx.beginPath();
+      ctx.arc(135, 68, 24, 0, Math.PI * 2);
+      ctx.fillStyle = "#fb923c";
+      ctx.fill();
+
+      // Back Mountain
+      ctx.beginPath();
+      ctx.moveTo(20, 165);
+      ctx.lineTo(80, 75);
+      ctx.lineTo(145, 165);
+      ctx.closePath();
+      ctx.fillStyle = "#475569";
+      ctx.fill();
+
+      // Front Mountain
+      ctx.beginPath();
+      ctx.moveTo(65, 165);
+      ctx.lineTo(125, 92);
+      ctx.lineTo(182, 165);
+      ctx.closePath();
+      ctx.fillStyle = "#334155";
+      ctx.fill();
+
+      // Snow Cap on Front Mountain
+      ctx.beginPath();
+      ctx.moveTo(125, 92);
+      ctx.lineTo(108, 113);
+      ctx.lineTo(120, 109);
+      ctx.lineTo(125, 116);
+      ctx.lineTo(131, 109);
+      ctx.lineTo(142, 113);
+      ctx.closePath();
+      ctx.fillStyle = "#f8fafc";
+      ctx.fill();
+
+      // Ground
+      ctx.fillStyle = "#22c55e";
+      ctx.fillRect(20, 162, 160, 14);
+    })();
+
+    // 5. Pine Tree
+    (function drawPineTree() {
+      const ctx = document.getElementById("art5").getContext("2d");
+
+      // Trunk
+      ctx.fillStyle = "#78350f";
+      ctx.fillRect(88, 142, 24, 34);
+
+      // Three tiered triangles
+      const tiers = [
+        { topY: 32, baseY: 85, halfW: 36, color: "#15803d" },
+        { topY: 64, baseY: 116, halfW: 48, color: "#16a34a" },
+        { topY: 94, baseY: 146, halfW: 60, color: "#22c55e" }
+      ];
+
+      tiers.forEach((t) => {
+        ctx.beginPath();
+        ctx.moveTo(100, t.topY);
+        ctx.lineTo(100 - t.halfW, t.baseY);
+        ctx.lineTo(100 + t.halfW, t.baseY);
+        ctx.closePath();
+        ctx.fillStyle = t.color;
+        ctx.fill();
+      });
+    })();
+
+    // 6. Campfire
+    (function drawCampfire() {
+      const ctx = document.getElementById("art6").getContext("2d");
+
+      // Crossed Logs
+      ctx.save();
+      ctx.translate(100, 152);
+      ctx.rotate(-0.25);
+      ctx.fillStyle = "#7c2d12";
+      ctx.fillRect(-46, -7, 92, 14);
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(100, 152);
+      ctx.rotate(0.25);
+      ctx.fillStyle = "#9a3412";
+      ctx.fillRect(-46, -7, 92, 14);
+      ctx.restore();
+
+      // Outer Flame
+      ctx.beginPath();
+      ctx.moveTo(66, 142);
+      ctx.quadraticCurveTo(58, 95, 100, 44);
+      ctx.quadraticCurveTo(142, 95, 134, 142);
+      ctx.closePath();
+      ctx.fillStyle = "#ea580c";
+      ctx.fill();
+
+      // Inner Flame
+      ctx.beginPath();
+      ctx.moveTo(80, 142);
+      ctx.quadraticCurveTo(78, 108, 100, 76);
+      ctx.quadraticCurveTo(122, 108, 120, 142);
+      ctx.closePath();
+      ctx.fillStyle = "#facc15";
+      ctx.fill();
+    })();
+
+    // 7. Lighthouse
+    (function drawLighthouse() {
+      const ctx = document.getElementById("art7").getContext("2d");
+
+      // Base Hill
+      ctx.beginPath();
+      ctx.arc(100, 185, 65, Math.PI, 0);
+      ctx.fillStyle = "#16a34a";
+      ctx.fill();
+
+      // Tower Body
+      ctx.beginPath();
+      ctx.moveTo(82, 75);
+      ctx.lineTo(118, 75);
+      ctx.lineTo(126, 152);
+      ctx.lineTo(74, 152);
+      ctx.closePath();
+      ctx.fillStyle = "#f8fafc";
+      ctx.fill();
+
+      // Red Stripe
+      ctx.beginPath();
+      ctx.moveTo(78, 105);
+      ctx.lineTo(122, 105);
+      ctx.lineTo(124, 126);
+      ctx.lineTo(76, 126);
+      ctx.closePath();
+      ctx.fillStyle = "#dc2626";
+      ctx.fill();
+
+      // Lantern Room
+      ctx.fillStyle = "#fef08a";
+      ctx.fillRect(86, 56, 28, 19);
+
+      // Roof
+      ctx.beginPath();
+      ctx.moveTo(82, 56);
+      ctx.lineTo(100, 36);
+      ctx.lineTo(118, 56);
+      ctx.closePath();
+      ctx.fillStyle = "#dc2626";
+      ctx.fill();
+    })();
+
+    // 8. Hot Air Balloon
+    (function drawBalloon() {
+      const ctx = document.getElementById("art8").getContext("2d");
+
+      // Ropes
+      ctx.beginPath();
+      ctx.moveTo(78, 106);
+      ctx.lineTo(88, 142);
+      ctx.moveTo(122, 106);
+      ctx.lineTo(112, 142);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#78350f";
+      ctx.stroke();
+
+      // Basket
+      ctx.fillStyle = "#92400e";
+      ctx.fillRect(85, 142, 30, 24);
+
+      // Balloon Envelope
+      ctx.beginPath();
+      ctx.arc(100, 74, 44, 0, Math.PI * 2);
+      ctx.fillStyle = "#ef4444";
+      ctx.fill();
+
+      // Center Stripe
+      ctx.beginPath();
+      ctx.ellipse(100, 74, 18, 44, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "#fef08a";
+      ctx.fill();
+
+      // Horizontal Band
+      ctx.fillStyle = "#2563eb";
+      ctx.fillRect(58, 68, 84, 12);
+    })();
+  </script>
+</body>
+</html>
