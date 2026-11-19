@@ -20,7 +20,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
     }
     header {
       text-align: center;
@@ -36,6 +36,7 @@
     }
     #hud {
       width: 900px;
+      max-width: 95vw;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 10px;
@@ -76,6 +77,7 @@
     #game-wrapper {
       position: relative;
       width: 900px;
+      max-width: 95vw;
       height: 500px;
       border: 2px solid #1e293b;
       border-top: none;
@@ -157,6 +159,20 @@
       opacity: 0;
       transition: opacity 0.25s;
       pointer-events: none;
+      z-index: 15;
+    }
+    .extra-links {
+      margin-top: 12px;
+      display: flex;
+      gap: 16px;
+      font-size: 0.9rem;
+    }
+    .extra-links a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+    .extra-links a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -224,13 +240,19 @@
     </div>
   </div>
 
+  <!-- Navigation Links Outside <script> -->
+  <nav class="extra-links">
+    <a href="SVG/animated-hourglass.html">View 300x300 Animated SVG</a>
+    <a href="canvas-art-8.html">View 8 Canvas Arts</a>
+  </nav>
+
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
     let gameRunning = false;
     let currentLevel = 0;
-    let phase = 'PAST'; 
+    let phase = 'PAST';
     let score = 0;
     let bestScore = localStorage.getItem('chronoBestScore') || 0;
     document.getElementById('best-score').textContent = bestScore;
@@ -242,428 +264,4 @@
 
     const probeSvg = new Image();
     probeSvg.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-        <rect x="4" y="6" width="24" height="20" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"/>
-        <circle cx="16" cy="16" r="5" fill="#06b6d4"/>
-        <circle cx="16" cy="16" r="2" fill="#ffffff"/>
-      </svg>
-    `);
-
-    const player = {
-      x: 50, y: 380, w: 30, h: 30,
-      vx: 0, vy: 0,
-      speed: 4.5,
-      jumpPower: -10.5,
-      jumps: 0,
-      maxJumps: 2,
-      hp: 100,
-      chronoEnergy: 100,
-      dashTimer: 0,
-      dashCooldown: 0,
-      invulnTimer: 0,
-      facing: 1
-    };
-
-    const keys = {};
-    window.addEventListener('keydown', e => {
-      keys[e.code] = true;
-
-      if (!gameRunning) {
-        if (e.code === 'Enter' || e.code === 'Space') {
-          e.preventDefault();
-          startGame();
-        }
-        return;
-      }
-
-      if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
-        if (player.jumps < player.maxJumps) {
-          player.vy = player.jumpPower;
-          player.jumps++;
-        }
-      }
-      if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
-        triggerChronoShift();
-      }
-      if (e.code === 'KeyE') {
-        triggerDash();
-      }
-    });
-
-    window.addEventListener('keyup', e => keys[e.code] = false);
-    
-    document.getElementById('start-btn').addEventListener('click', startGame);
-    document.getElementById('restart-btn').addEventListener('click', startGame);
-
-    canvas.addEventListener('contextmenu', e => {
-      e.preventDefault();
-      if (gameRunning) triggerChronoShift();
-    });
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.style.opacity = 1;
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => toast.style.opacity = 0, 1800);
-    }
-
-    function triggerChronoShift() {
-      if (shiftCooldown > 0 || player.chronoEnergy < 20) {
-        showToast("CHRONO-SHIFT RECHARGING!");
-        return;
-      }
-      player.chronoEnergy -= 20;
-      shiftCooldown = 0.5;
-      phase = (phase === 'PAST') ? 'PRESENT' : 'PAST';
-    }
-
-    function triggerDash() {
-      if (player.dashCooldown > 0) return;
-      player.dashTimer = 0.18;
-      player.invulnTimer = 0.3;
-      player.dashCooldown = 1.2;
-      player.vx = player.facing * 14;
-      player.vy = 0;
-    }
-
-    const levels = [
-      {
-        time: 90,
-        spawn: { x: 40, y: 380 },
-        exit: { x: 830, y: 90, w: 40, h: 50 },
-        platforms: [
-          { x: 0, y: 440, w: 280, h: 60, phase: 'ALL' },
-          { x: 330, y: 400, w: 140, h: 20, phase: 'PAST' },
-          { x: 520, y: 350, w: 140, h: 20, phase: 'PRESENT' },
-          { x: 710, y: 300, w: 190, h: 20, phase: 'ALL' },
-          { x: 480, y: 230, w: 160, h: 20, phase: 'PAST' },
-          { x: 230, y: 190, w: 180, h: 20, phase: 'PRESENT' },
-          { x: 40, y: 140, w: 130, h: 20, phase: 'ALL' },
-          { x: 740, y: 140, w: 160, h: 20, phase: 'ALL' }
-        ],
-        lasers: [
-          { x: 380, y: 330, w: 12, h: 70, phase: 'PRESENT' },
-          { x: 580, y: 280, w: 12, h: 70, phase: 'PAST' }
-        ],
-        sentries: [
-          { x: 240, y: 155, minX: 230, maxX: 380, vx: 2 }
-        ],
-        cores: [
-          { x: 580, y: 315, collected: false },
-          { x: 80, y: 105, collected: false },
-          { x: 800, y: 265, collected: false }
-        ],
-        orbs: [
-          { x: 390, y: 365, collected: false },
-          { x: 540, y: 195, collected: false },
-          { x: 300, y: 155, collected: false }
-        ]
-      },
-      {
-        time: 85,
-        spawn: { x: 40, y: 400 },
-        exit: { x: 830, y: 390, w: 40, h: 50 },
-        platforms: [
-          { x: 0, y: 450, w: 180, h: 50, phase: 'ALL' },
-          { x: 230, y: 390, w: 120, h: 20, phase: 'PRESENT' },
-          { x: 400, y: 330, w: 120, h: 20, phase: 'PAST' },
-          { x: 570, y: 270, w: 120, h: 20, phase: 'PRESENT' },
-          { x: 360, y: 190, w: 150, h: 20, phase: 'ALL' },
-          { x: 120, y: 150, w: 150, h: 20, phase: 'PAST' },
-          { x: 740, y: 440, w: 160, h: 60, phase: 'ALL' }
-        ],
-        lasers: [
-          { x: 430, y: 120, w: 12, h: 70, phase: 'PRESENT' },
-          { x: 620, y: 200, w: 12, h: 70, phase: 'PAST' }
-        ],
-        sentries: [
-          { x: 370, y: 155, minX: 360, maxX: 480, vx: 2.6 },
-          { x: 140, y: 115, minX: 120, maxX: 240, vx: 2.2 }
-        ],
-        cores: [
-          { x: 180, y: 115, collected: false },
-          { x: 620, y: 235, collected: false },
-          { x: 430, y: 295, collected: false }
-        ],
-        orbs: [
-          { x: 280, y: 355, collected: false },
-          { x: 430, y: 155, collected: false },
-          { x: 760, y: 405, collected: false }
-        ]
-      }
-    ];
-
-    let activeLevelData = null;
-
-    function loadLevel(idx) {
-      activeLevelData = JSON.parse(JSON.stringify(levels[idx]));
-      player.x = activeLevelData.spawn.x;
-      player.y = activeLevelData.spawn.y;
-      player.vx = 0;
-      player.vy = 0;
-      player.hp = 100;
-      player.chronoEnergy = 100;
-      phase = 'PAST';
-      timeLeft = activeLevelData.time;
-    }
-
-    function startGame() {
-      score = 0;
-      currentLevel = 0;
-      loadLevel(currentLevel);
-      document.getElementById('start-screen').classList.add('hidden');
-      document.getElementById('end-screen').classList.add('hidden');
-      gameRunning = true;
-      lastTimestamp = performance.now();
-      requestAnimationFrame(gameLoop);
-    }
-
-    function endGame(won, title, desc) {
-      gameRunning = false;
-      if (score > bestScore) {
-        bestScore = score;
-        localStorage.setItem('chronoBestScore', bestScore);
-        document.getElementById('best-score').textContent = bestScore;
-      }
-      document.getElementById('end-title').textContent = title;
-      document.getElementById('end-title').style.color = won ? '#10b981' : '#f43f5e';
-      document.getElementById('end-desc').textContent = desc;
-      document.getElementById('end-stats').textContent = `Final Score: ${score} pts`;
-      document.getElementById('end-screen').classList.remove('hidden');
-    }
-
-    function rectIntersect(a, b) {
-      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-    }
-
-    function damagePlayer(amount) {
-      if (player.invulnTimer > 0) return;
-      player.hp -= amount;
-      player.invulnTimer = 0.8;
-      if (player.hp <= 0) {
-        player.hp = 0;
-        endGame(false, "PROBE DESTROYED", "Structural Integrity reached 0%. AETHER security neutralized Echo-01.");
-      }
-    }
-
-    function update(dt) {
-      timeLeft -= dt;
-      if (timeLeft <= 0) {
-        timeLeft = 0;
-        endGame(false, "SYSTEM PURGE COMPLETE", "Time limit expired before mainframe extraction.");
-        return;
-      }
-
-      if (shiftCooldown > 0) shiftCooldown -= dt;
-      if (player.dashCooldown > 0) player.dashCooldown -= dt;
-      if (player.invulnTimer > 0) player.invulnTimer -= dt;
-
-      if (player.chronoEnergy < 100) {
-        player.chronoEnergy = Math.min(100, player.chronoEnergy + 12 * dt);
-      }
-
-      if (player.dashTimer > 0) {
-        player.dashTimer -= dt;
-      } else {
-        if (keys['KeyA'] || keys['ArrowLeft']) {
-          player.vx = -player.speed;
-          player.facing = -1;
-        } else if (keys['KeyD'] || keys['ArrowRight']) {
-          player.vx = player.speed;
-          player.facing = 1;
-        } else {
-          player.vx *= 0.8;
-        }
-        player.vy += 0.52;
-      }
-
-      player.x += player.vx;
-      player.y += player.vy;
-
-      if (player.x < 0) player.x = 0;
-      if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
-
-      if (player.y > canvas.height) {
-        endGame(false, "SIGNAL LOST", "Echo-01 fell into the unmapped digital void.");
-        return;
-      }
-
-      activeLevelData.platforms.forEach(p => {
-        if (p.phase !== 'ALL' && p.phase !== phase) return;
-        if (rectIntersect(player, p)) {
-          if (player.vy > 0 && player.y + player.h - player.vy <= p.y + 10) {
-            player.y = p.y - player.h;
-            player.vy = 0;
-            player.jumps = 0;
-          }
-        }
-      });
-
-      activeLevelData.lasers.forEach(l => {
-        if (l.phase === phase && rectIntersect(player, l)) {
-          damagePlayer(25);
-        }
-      });
-
-      activeLevelData.sentries.forEach(s => {
-        s.x += s.vx;
-        if (s.x <= s.minX || s.x >= s.maxX) s.vx *= -1;
-        if (rectIntersect(player, { x: s.x, y: s.y, w: 26, h: 20 })) {
-          damagePlayer(25);
-        }
-      });
-
-      activeLevelData.cores.forEach(c => {
-        if (!c.collected && rectIntersect(player, { x: c.x - 10, y: c.y - 10, w: 20, h: 20 })) {
-          c.collected = true;
-          score += 1000;
-        }
-      });
-
-      activeLevelData.orbs.forEach(o => {
-        if (!o.collected && rectIntersect(player, { x: o.x - 8, y: o.y - 8, w: 16, h: 16 })) {
-          o.collected = true;
-          score += (phase === 'PRESENT') ? 350 : 250;
-        }
-      });
-
-      const collectedCount = activeLevelData.cores.filter(c => c.collected).length;
-      const totalCores = activeLevelData.cores.length;
-
-      if (rectIntersect(player, activeLevelData.exit)) {
-        if (collectedCount < totalCores) {
-          showToast(`EXIT LOCKED: ${totalCores - collectedCount} DATA CORE(S) REMAINING!`);
-        } else {
-          score += Math.floor(timeLeft * 10);
-          if (player.hp === 100) score += 2500;
-
-          if (currentLevel + 1 < levels.length) {
-            currentLevel++;
-            loadLevel(currentLevel);
-            showToast(`FIREWALL ${currentLevel} BREACHED!`);
-          } else {
-            endGame(true, "MAINFRAME LIBERATED!", "All AETHER security firewalls bypassed. Global power grid restored!");
-          }
-        }
-      }
-
-      document.getElementById('hp-text').textContent = `${player.hp}%`;
-      document.getElementById('hp-bar').style.width = `${player.hp}%`;
-      document.getElementById('chrono-bar').style.width = `${player.chronoEnergy}%`;
-
-      const phaseEl = document.getElementById('phase-text');
-      if (phase === 'PAST') {
-        phaseEl.textContent = 'PAST (CYAN)';
-        phaseEl.style.color = '#06b6d4';
-        document.getElementById('chrono-bar').style.background = '#06b6d4';
-      } else {
-        phaseEl.textContent = 'PRESENT (AMBER)';
-        phaseEl.style.color = '#f59e0b';
-        document.getElementById('chrono-bar').style.background = '#f59e0b';
-      }
-
-      document.getElementById('cores-text').textContent = `${collectedCount} / ${totalCores}`;
-      document.getElementById('timer-text').textContent = `${timeLeft.toFixed(1)}s`;
-      document.getElementById('score-text').textContent = score;
-    }
-
-    function draw() {
-      ctx.fillStyle = phase === 'PAST' ? '#081226' : '#1a1016';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.strokeStyle = phase === 'PAST' ? 'rgba(6, 182, 212, 0.08)' : 'rgba(245, 158, 11, 0.08)';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < canvas.width; x += 40) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-      }
-      for (let y = 0; y < canvas.height; y += 40) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-      }
-
-      activeLevelData.platforms.forEach(p => {
-        const active = (p.phase === 'ALL' || p.phase === phase);
-        if (p.phase === 'ALL') {
-          ctx.fillStyle = '#334155';
-          ctx.strokeStyle = '#94a3b8';
-        } else if (p.phase === 'PAST') {
-          ctx.fillStyle = active ? 'rgba(6, 182, 212, 0.35)' : 'rgba(6, 182, 212, 0.06)';
-          ctx.strokeStyle = active ? '#06b6d4' : 'rgba(6, 182, 212, 0.25)';
-        } else {
-          ctx.fillStyle = active ? 'rgba(245, 158, 11, 0.35)' : 'rgba(245, 158, 11, 0.06)';
-          ctx.strokeStyle = active ? '#f59e0b' : 'rgba(245, 158, 11, 0.25)';
-        }
-        ctx.fillRect(p.x, p.y, p.w, p.h);
-        ctx.strokeRect(p.x, p.y, p.w, p.h);
-      });
-
-      activeLevelData.lasers.forEach(l => {
-        if (l.phase === phase) {
-          ctx.fillStyle = '#f43f5e';
-          ctx.shadowColor = '#f43f5e';
-          ctx.shadowBlur = 12;
-          ctx.fillRect(l.x, l.y, l.w, l.h);
-          ctx.shadowBlur = 0;
-        } else {
-          ctx.strokeStyle = 'rgba(244, 63, 94, 0.25)';
-          ctx.strokeRect(l.x, l.y, l.w, l.h);
-        }
-      });
-
-      const allCoresCollected = activeLevelData.cores.every(c => c.collected);
-      const ex = activeLevelData.exit;
-      ctx.fillStyle = allCoresCollected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.2)';
-      ctx.strokeStyle = allCoresCollected ? '#10b981' : '#f43f5e';
-      ctx.lineWidth = 2;
-      ctx.fillRect(ex.x, ex.y, ex.w, ex.h);
-      ctx.strokeRect(ex.x, ex.y, ex.w, ex.h);
-
-      activeLevelData.cores.forEach(c => {
-        if (c.collected) return;
-        ctx.fillStyle = '#38bdf8';
-        ctx.beginPath();
-        ctx.moveTo(c.x, c.y - 10);
-        ctx.lineTo(c.x + 10, c.y);
-        ctx.lineTo(c.x, c.y + 10);
-        ctx.lineTo(c.x - 10, c.y);
-        ctx.closePath();
-        ctx.fill();
-      });
-
-      activeLevelData.orbs.forEach(o => {
-        if (o.collected) return;
-        ctx.fillStyle = '#a855f7';
-        ctx.beginPath();
-        ctx.arc(o.x, o.y, 6, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      activeLevelData.sentries.forEach(s => {
-        ctx.fillStyle = '#e11d48';
-        ctx.beginPath();
-        ctx.moveTo(s.x, s.y + 10);
-        ctx.lineTo(s.x + 13, s.y);
-        ctx.lineTo(s.x + 26, s.y + 10);
-        ctx.lineTo(s.x + 13, s.y + 20);
-        ctx.closePath();
-        ctx.fill();
-      });
-
-      if (player.invulnTimer <= 0 || Math.floor(performance.now() / 80) % 2 === 0) {
-        ctx.drawImage(probeSvg, player.x, player.y, player.w, player.h);
-      }
-    }
-
-    function gameLoop(timestamp) {
-      if (!gameRunning) return;
-      const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
-      lastTimestamp = timestamp;
-
-      update(dt);
-      draw();
-      requestAnimationFrame(gameLoop);
-    }
-    <a href="SVG/animated-hourglass.html">View 300x300 Animated SVG</a>
-  </script>
-</body>
-</html>
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height
